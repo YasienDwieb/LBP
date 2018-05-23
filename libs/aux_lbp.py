@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Fri Oct 14 18:53:13 2016
-
-@author: nhern121@cs.fiu.edu
-"""
-
 import pandas as pd
 import numpy as np
 import networkx as nx
@@ -14,16 +7,21 @@ import sys
 from decimal import *
 import math
 
-
 #Complement functions to LBP.
 ###############################################################################
-#This function computes the compatibility potentials as defined in the Paper.
-# Note that this is based on the weight of the link between its end points.
-# Delta can be set based on domain knowledge or using ground truth data.
+#This function computes the propagation matrix as defined in the Paper.
 
-def compatibility(w,delta):
-    delta=Decimal(delta)
-    return (delta,delta**Decimal(math.log(w)),Decimal(1)-delta,Decimal(1)-(delta**Decimal(math.log(w))))
+def propagation(w,ep=0.05):
+    ff=float(ep)
+    fa=float(1-2*ep)
+    fh=float(ep)
+    af=float(0.5)
+    aa=float(2*ep)
+    ah=float(0.5-2*ep)
+    hf=float(ep)
+    ha=float((1-ep)/2)
+    hh=float((1-ep)/2)
+    return (ff,fa,fh,af,aa,ah,hf,ha,hh)
 
 
 ###############################################################################
@@ -43,16 +41,23 @@ def prods((u,v),c,g):
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==s:
-                prod=Decimal(prod)*Decimal(g[h][w]['msdsO_h'])
+                prod=float(prod)*float(g[h][w]['msdsO_h'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssdO_h'])
-    elif c=='s':
+                prod=float(prod)*float(g[h][w]['mssdO_h'])
+    elif c=='a':
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==s:
-                prod=Decimal(prod)*Decimal(g[h][w]['msdsO_s'])
+                prod=float(prod)*float(g[h][w]['msdsO_a'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssdO_s'])
+                prod=float(prod)*float(g[h][w]['mssdO_a'])
+    elif c=='f':
+        prod=1
+        for (h,w) in n:
+            if g[h][w]['source']==s:
+                prod=float(prod)*float(g[h][w]['msdsO_f'])
+            else:
+                prod=float(prod)*float(g[h][w]['mssdO_f'])
     return prod
 
 ##############################################################################
@@ -72,16 +77,23 @@ def prodd((u,v),c,g):
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==d:
-                prod=Decimal(prod)*Decimal(g[h][w]['msdsO_h'])
+                prod=float(prod)*float(g[h][w]['msdsO_h'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssdO_h'])
-    elif c=='s':
+                prod=float(prod)*float(g[h][w]['mssdO_h'])
+    elif c=='a':
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==d:
-                prod=Decimal(prod)*Decimal(g[h][w]['msdsO_s'])
+                prod=float(prod)*float(g[h][w]['msdsO_a'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssdO_s'])
+                prod=float(prod)*float(g[h][w]['mssdO_a'])
+    elif c=='f':
+        prod=1
+        for (h,w) in n:
+            if g[h][w]['source']==d:
+                prod=float(prod)*float(g[h][w]['msdsO_f'])
+            else:
+                prod=float(prod)*float(g[h][w]['mssdO_f'])
     return prod    
 
 ###############################################################################    
@@ -98,15 +110,22 @@ def prodnode(u,c,g):
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==u:
-                prod=Decimal(prod)*Decimal(g[h][w]['msds_h'])
+                prod=float(prod)*float(g[h][w]['msds_h'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssd_h'])
-    elif c=='s':
+                prod=float(prod)*float(g[h][w]['mssd_h'])
+    elif c=='a':
         prod=1
         for (h,w) in n:
             if g[h][w]['source']==u:
-                prod=Decimal(prod)*Decimal(g[h][w]['msds_s'])
+                prod=float(prod)*float(g[h][w]['msds_a'])
             else:
-                prod=Decimal(prod)*Decimal(g[h][w]['mssd_s'])
+                prod=float(prod)*float(g[h][w]['mssd_a'])
+    elif c=='f':
+        prod=1
+        for (h,w) in n:
+            if g[h][w]['source']==u:
+                prod=float(prod)*float(g[h][w]['msds_f'])
+            else:
+                prod=float(prod)*float(g[h][w]['mssd_f'])
     return prod
     
